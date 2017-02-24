@@ -55,7 +55,7 @@ export class ImageLoader {
   }
 
   constructor(private config: ImageLoaderConfig) {
-    if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+    if (!window.cordova) {
       // we are running on a browser, or using livereload
       // plugin will not function in this case
       this.isInit = true;
@@ -216,9 +216,10 @@ export class ImageLoader {
         if (this.shouldIndex) {
           this.addFileToIndex(file).then(this.maintainCacheSize.bind(this));
         }
-
-        currentItem.resolve(localPath);
-        done();
+        this.getCachedImagePath(currentItem.imageUrl).then(path => { 
+          currentItem.resolve(path);
+          done();
+        });
       })
       .catch((e) => {
         currentItem.reject();
